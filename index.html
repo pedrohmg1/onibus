@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link rel="stylesheet" type="text/css" href="./css/styles.css" />
+  <link href="./src/output.css" rel="stylesheet" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <title>Monitoramento de Ônibus</title>
+
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+
+  <style>
+    /* Container flex alinhado à esquerda */
+    .content-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between; /* mapa à esquerda, avisos à direita */
+  margin-top: 1.5rem;
+  flex-wrap: nowrap; /* evita quebra para manter distância */
+}
+
+#mapa {
+  flex: 0 0 600px;
+  height: 400px;
+  border: 2px solid #ccc;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+#avisos {
+  flex: 0 0 300px; /* largura fixa para avisos também */
+  background-color: #ffffff;
+  border: 2px solid #ff9292;
+  border-radius: 10px;
+  padding: 1rem 1.5rem;
+  font-family: 'Inter', sans-serif;
+  color: #b82a22;
+  box-shadow: 0 4px 8px rgba(227, 52, 47, 0.15);
+}
+
+
+    #avisos h2 {
+      margin-top: 0;
+      font-weight: 700;
+      font-size: 1.2rem;
+      margin-bottom: 1rem;
+    }
+
+    #lista-avisos {
+      list-style: disc inside;
+      padding-left: 0;
+      margin: 0;
+      font-weight: 600;
+      font-size: 1rem;
+      line-height: 1.4;
+    }
+
+    /* Responsividade */
+    @media (max-width: 768px) {
+      .content-row {
+        flex-direction: column;
+        align-items: stretch;
+        justify-content: center; /* centraliza em telas pequenas */
+      }
+      #mapa, #avisos {
+        flex: 1 1 100%;
+        height: 250px;
+        max-width: 100%;
+      }
+      #avisos {
+        min-width: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- topbar -->
+  <header class="topbar" role="banner">
+    <div class="container topbar-inner mx-auto">
+      <a class="brand" href="index.html" aria-label="Página inicial VigiBus">
+        <span class="brand-strong">Sem nome Bus</span><br /> Monitoramento
+      </a>
+
+      <nav aria-label="Navegação principal">
+        <div class="mobile-menu">
+          <div class="line1"></div>
+          <div class="line2"></div>
+          <div class="line3"></div>
+        </div>
+
+        <ul class="nav-list">
+          <li><a class="nav-link" aria-current="page" href="index.html">Início</a></li>
+          <li><a class="nav-link" href="#mapa">Mapa</a></li>
+          <li><a class="nav-link" href="exibicao.html">Linhas</a></li>
+          <li><a class="nav-link" href="#alertas">Alertas</a></li>
+          <li><a class="nav-link" href="#sobre">Sobre</a></li>
+        </ul>
+      </nav>
+
+      <div class="actions">
+        <a href="login.html" class="btn btn-outline">Entrar</a>
+        <a href="cadastro.html" class="btn btn-primary">Criar conta</a>
+      </div>
+    </div>
+  </header>
+
+  <main></main>
+
+  <!-- hero -->
+  <section class="hero flex" id="inicio">
+    <div class="container hero-grid">
+      <div>
+        <div class="kicker">Transporte urbano</div>
+        <h1>Monitoramento de <br />ônibus <span style="color:var(--red)">em tempo real</span></h1>
+        <p class="sub">Acompanhe a posição dos veículos, horários previstos e atrasos</p>
+
+        <!-- Conteúdo: mapa e avisos lado a lado alinhados à esquerda -->
+        <div class="content-row">
+  <div id="mapa"></div>
+  <aside id="avisos" role="complementary" aria-label="Avisos de linhas atrasadas">
+    <h2>Alertas</h2>
+    <ul id="lista-avisos">
+      <li>273D-10 Atrasado </li>
+      <li>273D-10 Atrasado</li>
+      <li>273D-10 Atrasado</li>
+    </ul>
+  </aside>
+</div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Botão flutuante -->
+  <div class="fixed bottom-32 right-12 md:bottom-32 md:right-12">
+    <a
+      href="exibicao.html"
+      class="
+          bg-red-600 text-white font-bold
+          px-12 py-5 md:px-8 md:py-5
+          text-2xl md:text-4xl
+          rounded-2xl shadow-lg
+          hover:bg-red-800  focus:ring-2 focus:ring-red-400 focus:ring-opacity-75
+          transition-all duration-200 ease-out
+        "
+      >Acessar</a
+    >
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/mobile-navbar.js"></script>
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script>
+    // Inicializa o mapa (sem marcador)
+    const map = L.map('mapa').setView([-23.55052, -46.633308], 12); // São Paulo como exemplo
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
+    }).addTo(map);
+  </script>
+  <section 
+  id="feedback" style="max-width: 600px; margin: 3rem 0 3rem 12rem; padding: 2rem; border: 2px solid #cccccc; border-radius: 12px; background-color: #ffffff; font-family: 'Inter', sans-serif;">
+  <h2 style="color: #b82a22; font-weight: 700; margin-bottom: 1rem;">Deixe seu feedback</h2>
+
+  <form action="#" method="POST" style="display: flex; flex-direction: column; gap: 1rem;">
+    <label for="nome" style="font-weight: 600;">Nome</label>
+    <input type="text" id="nome" name="nome" placeholder="Seu nome" required style="padding: 0.5rem; border: 1px solid #ccc; border-radius: 6px;" />
+
+    <label for="email" style="font-weight: 600;">Email</label>
+    <input type="email" id="email" name="email" placeholder="Opcional" style="padding: 0.5rem; border: 1px solid #ccc; border-radius: 6px;" />
+
+    <label for="mensagem" style="font-weight: 600;">Mensagem</label>
+    <textarea id="mensagem" name="mensagem" rows="5" placeholder="Escreva sua mensagem aqui..." required style="padding: 0.5rem; border: 1px solid #ccc; border-radius: 6px; resize: vertical;"></textarea>
+
+    <button type="submit" style="
+      background-color: #e3342f;
+      color: white;
+      font-weight: 700;
+      padding: 0.75rem;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    " onmouseover="this.style.backgroundColor='#b82a22'" onmouseout="this.style.backgroundColor='#e3342f'">
+      Enviar Feedback
+    </button>
+  </form>
+</section>
+
+</body>
+</html>
+
+
